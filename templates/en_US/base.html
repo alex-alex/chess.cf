@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% block head %}
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Chess</title>
+
+		<!-- Bootstrap -->
+		<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css -->
+		<link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/assets/css/bootstrap-theme.min.css" rel="stylesheet">
+
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+		
+		<link href="/assets/css/chess.css" rel="stylesheet">
+		<style>
+			.dropdown-menu li a {
+				color: black !important;
+			}
+			.btn-group {
+				position: relative;
+				display: inline-block;
+				vertical-align: middle;
+				width: 100%;
+				text-align: center;
+			}
+			.btn-group>.btn, .btn-group-vertical>.btn {
+				float: inherit;
+			}
+			#new-game label.btn.btn-default {
+				margin-left: -5px;
+			}
+		</style>
+		{% endblock %}
+	</head>
+	<body>
+		
+		{% block modals %}
+		<form action="/newgame" method="post" id="new-game">
+			<div class="modal fade" id="newGameModal" tabindex="-1" role="dialog">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title"><span class="glyphicon glyphicon-play-circle"></span> New game</h4>
+			      </div>
+			      <div class="modal-body">
+					<div class="btn-group" data-toggle="buttons">
+		                <label class="btn btn-default active">
+		                    <input type="radio" name="opponent" value="computer" checked /> <span class="glyphicon glyphicon-dashboard"></span> Against computer
+		                </label> 
+		                <label class="btn btn-default">
+		                    <input type="radio" name="opponent" value="friend" /><span class="glyphicon glyphicon-user"></span> Against friend
+		                </label>
+		                <!--<label class="btn btn-default">
+		                    <input type="radio" name="opponent" value="link" /><span class="glyphicon glyphicon-link"></span> Generate link
+		                </label>-->
+		            </div>
+					<select name="opponent-friend" class="form-control" style="width: 300px; margin: 20px auto 0 auto; display: none;">
+						{% for friendKey in user.friends %}
+						<option value="{{ friendKey.id() }}">{{ friendKey.get().username() }}</option>
+						{% else %}
+						<option disabled value="None">Žádní přátelé</option>
+						{% endfor %}
+					</select>
+					<div class="btn-group" data-toggle="buttons" style="margin-top: 20px;">
+		                <label class="btn btn-default">
+		                    <input type="radio" name="color" value="white" /> ♖ White
+		                </label> 
+		                <label class="btn btn-default active">
+		                    <input type="radio" name="color" value="random" checked /> <span class="glyphicon glyphicon-random"></span> Random
+		                </label> 
+		                <label class="btn btn-default">
+		                    <input type="radio" name="color" value="black" /> ♜ Black
+		                </label> 
+		            </div>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="submit" class="btn btn-primary">Create</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+		</form>
+		{% endblock %}
+		
+	    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	      <div class="container">
+	        <div class="navbar-header">
+	          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+	          	<span class="icon-bar"></span>
+	          	<span class="icon-bar"></span>
+	          	<span class="icon-bar"></span>
+	          </button>
+	          <a href="/"><span class="navbar-brand"><span class="glyphicon glyphicon-tower"></span> chess.cf</span></a>
+	        </div>
+	        <div class="collapse navbar-collapse" id="navbar-collapse">
+			  {% if user %}
+	          <ul class="nav navbar-nav">
+	            <li><a href="#" data-toggle="modal" data-target="#newGameModal"><span class="glyphicon glyphicon-play-circle"></span> New game</a></li>
+				<li{% block games_menu_item %}{% endblock %}><a href="/games"><span class="glyphicon glyphicon-th-list"></span> My games</a></li>
+	            <li{% block friends_menu_item %}{% endblock %}><a href="/friends"><span class="glyphicon glyphicon-user"></span> Friends{% if user.requestedFriends|length > 0 %}&nbsp;&nbsp;<span class="badge" style="background-color: #d9534f">{{ user.requestedFriends|length }}</span>{% endif %}</a></li>
+	            <li{% block settings_menu_item %}{% endblock %}><a href="/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+	          </ul>
+			  {% endif %}
+	          <ul class="nav navbar-nav navbar-right">
+				{% if user %}
+				<li class="dropdown">
+                 <a href="/profile" class="dropdown-toggle" data-toggle="dropdown">{{ user.username() }}<!-- <span class="badge">L9</span>--> <b class="caret"></b></a>
+				 <ul class="dropdown-menu">
+		             <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+				 </ul>
+                </li>
+				{% else %}
+	            <li><a href="/register"><span class="glyphicon glyphicon-user"></span> Register</a></li>
+				<li class="dropdown">
+                 <a href="/login" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in"></span> Log in <b class="caret"></b></a>
+                 <ul class="dropdown-menu" style="padding: 15px;min-width: 250px;">
+                    <li>
+                       <div class="row">
+                          <div class="col-md-12">
+                             <form class="form" role="form" method="post" action="/login" accept-charset="UTF-8" id="login-nav">
+                                <div class="form-group">
+                                   <label class="sr-only" for="username">Username</label>
+                                   <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                                </div>
+                                <div class="form-group">
+                                   <label class="sr-only" for="password">Password</label>
+                                   <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                                </div>
+                                <div class="checkbox">
+                                   <label>
+                                   	 <input type="checkbox" name="remember"> Remember
+                                   </label>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0">
+                                   <button type="submit" class="btn btn-success btn-block">Log in</button>
+                                </div>
+                             </form>
+                          </div>
+                       </div>
+                    </li>
+                    <!--<li class="divider"></li>
+                    <li>
+                       <input class="btn btn-primary btn-block" type="button" id="sign-in-google" value="Sign In with Google">
+                       <input class="btn btn-primary btn-block" type="button" id="sign-in-twitter" value="Sign In with Twitter">
+                    </li>-->
+                 </ul>
+                </li>
+				{% endif %}
+			  </ul>
+	        </div><!--/.nav-collapse -->
+	      </div>
+	    </div>
+		
+		{% block body %}{% endblock %}
+		
+		<!--<div class="footer">
+			<div class="container">
+				<p class="text-muted">© 2014 Alex Studnička</p>
+			</div>
+	    </div>-->
+		
+		{% block scripts %}
+		<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+		<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+		<script>
+			$('input[name=opponent]').change(function () {
+				if ($("input[name=opponent][value=friend]").is(":checked")) {
+					//$("select[name=opponent-friend]").slideDown()
+					$("select[name=opponent-friend]").stop(true, true).fadeIn({ duration: 400, queue: false }).css('display', 'none').slideDown(400);
+				} else {
+					//$("select[name=opponent-friend]").slideUp()
+					$("select[name=opponent-friend]").stop(true, true).fadeOut({ duration: 400, queue: false }).slideUp(400);
+				}
+			})
+		</script>
+		{% endblock %}
+		
+		{% include 'analytics.html' %}
+  </body>
+</html>

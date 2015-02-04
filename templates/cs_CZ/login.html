@@ -1,0 +1,64 @@
+{% extends "cs_CZ/base.html" %}
+
+{% block head %}
+    {{ super() }}
+	<!-- cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/css/bootstrapValidator.min.css -->
+	<link href="/assets/css/bootstrapValidator.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+	<div style="width: 400px; position: absolute; left: 50%; margin-left: -200px;">
+		<h1>Přihlášení</h1><br>
+		{% if error %}
+		<div class="alert alert-danger" role="alert">Chyba při přihlašování</div>
+		{% endif %}
+        <form class="form" role="form" method="post" action="/login" accept-charset="UTF-8" id="login-form">
+           <div class="form-group">
+              <label class="sr-only" for="username">Uživatelské jméno</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Uživatelské jméno" required>
+           </div>
+           <div class="form-group">
+              <label class="sr-only" for="password">Heslo</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Heslo" required>
+           </div>
+           <div class="checkbox">
+              <label>
+                <input type="checkbox" name="remember"> Zapamatovat
+              </label>
+           </div>
+           <div class="form-group">
+              <button type="submit" class="btn btn-success btn-block">Přihlásit se</button>
+           </div>
+        </form>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+	<!-- cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.min.js -->
+	<script type="text/javascript" src="/assets/js/bootstrapValidator.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+		    $('#login-form').bootstrapValidator({
+				fields: {
+	                username: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: 'Uživatelské jméno nesmí být prázné'
+	                        }
+	                    }
+	                },
+					password: {
+		                validators: {
+	                        notEmpty: {
+	                            message: 'Heslo nesmí být prázné'
+	                        }
+		                }
+		            }
+	            }
+		    });
+		});
+	</script>
+{% endblock %}

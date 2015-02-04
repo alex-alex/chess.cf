@@ -1,0 +1,137 @@
+{% extends "cs_CZ/base.html" %}
+
+{% block head %}
+    {{ super() }}
+	<!-- cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/css/bootstrapValidator.min.css -->
+	<link href="/assets/css/formValidation.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+	<div style="width: 400px; position: absolute; left: 50%; margin-left: -200px;">
+		<h1>Registrace</h1><br>
+		{% if result %}
+		<div class="alert alert-danger" role="alert">
+			<strong>Při registraci se vyskytla chyba</strong><br>
+			{{ result[1] }}
+		</div>
+		{% endif %}
+        <form class="form" role="form" method="post" action="/register" accept-charset="UTF-8" id="register-form">
+           <div class="form-group">
+              <input type="text" class="form-control" id="username" name="username" placeholder="Uživatelské jméno" required>
+           </div>
+           <div class="form-group">
+              <input type="email" class="form-control" id="email" name="email" placeholder="E-mail" required>
+           </div>
+           <div class="form-group">
+              <input type="password" class="form-control" id="password" name="password" placeholder="Heslo" required>
+           </div>
+           <div class="form-group">
+              <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Heslo (znovu)" required>
+           </div>
+		   <div class="form-group" id="recaptcha-container" style="margin-left: 45px;">
+			   <div class="g-recaptcha" data-sitekey="6LdTFgATAAAAACSBxorJ92yp6FYb-zThtZ22ZrF_" data-callback="captchaCallback"></div>
+			   <input type="checkbox" class="form-control" id="captchaDone" name="captchaDone" style="opacity: 0">
+		   </div>
+           <div class="form-group">
+              <button type="submit" class="btn btn-success btn-block">Registrovat se</button>
+           </div>
+        </form>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+	<script type="text/javascript" src="/assets/js/formValidation.min.js"></script>
+	<script type="text/javascript" src="/assets/js/formValidation-bootstrap.min.js"></script>
+	<script type="text/javascript" src="/assets/js/fromValidation-language/cs_CZ.js"></script>
+	<script src='https://www.google.com/recaptcha/api.js?hl=cs'></script>
+	<script type="text/javascript">
+		var captchaCallback = function() {
+			$('#captchaDone')[0].click();
+	  	};
+		
+		$(document).ready(function() {
+			$('#register-form').formValidation({
+				framework: 'bootstrap',
+		        locale: 'cs_CZ',
+				icon: {
+					valid: 'glyphicon glyphicon-ok',
+					invalid: 'glyphicon glyphicon-remove',
+					validating: 'glyphicon glyphicon-refresh'
+				},
+				fields: {
+	                username: {
+	                    validators: {
+	                        notEmpty: {
+	                            //message: 'Uživatelské jméno nesmí být prázné'
+	                        },
+	                        stringLength: {
+	                            min: 3,
+	                            max: 30,
+	                            //message: 'Uživatelské jméno musí být dlouhé alespoň %s a méně než %s znaků'
+	                        },
+	                        regexp: {
+	                            regexp: /^[a-zA-Z0-9_-]+$/,
+	                            //message: 'Uživatelské jméno smí obsahovat pouze písmena, čísla, podtržítko a pomlčku'
+	                        }
+	                    }
+	                },
+	                email: {
+	                    validators: {
+	                        notEmpty: {
+	                            //message: 'E-mail nesmí být prázdný'
+	                        },
+	                        emailAddress: {
+	                            //message: 'Není platná e-mailová adresa'
+	                        }
+	                    }
+	                },
+					password: {
+		                validators: {
+	                        notEmpty: {
+	                            //message: 'Heslo nesmí být prázné'
+	                        },
+	                        stringLength: {
+	                            min: 6,
+	                            max: 30,
+	                            //message: 'Heslo musí být dlouhé alespoň %s a méně než %s znaků'
+	                        }
+		                }
+		            },
+		            confirmPassword: {
+		                validators: {
+	                        notEmpty: {
+	                            //message: 'Heslo nesmí být prázné'
+	                        },
+		                    identical: {
+		                        field: 'password',
+		                        //message: 'Hesla se neshodují'
+		                    }
+		                }
+		            },
+					captchaDone: {
+		                validators: {
+							callback: {
+							    callback: function(value, validator, $field) {
+									if ($('#captchaDone').prop("checked")) {
+								        return {
+								            valid: true
+								        }
+									} else {
+								        return {
+								            valid: false,
+								            //message: 'Potvrďte CAPTCHA'
+								        }
+									}
+							    }
+							}
+		                }
+					}
+				}
+			});
+			
+		});
+	</script>
+{% endblock %}

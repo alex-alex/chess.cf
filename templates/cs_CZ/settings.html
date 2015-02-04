@@ -1,0 +1,104 @@
+{% extends "cs_CZ/base.html" %}
+
+{% block head %}
+	{{ super() }}
+	<link href="/assets/css/bootstrap-slider.min.css" rel="stylesheet">
+	<style>
+		#difficultySlider .slider-selection {
+			background: lightgray;
+		}
+		
+		.theme-chooser {
+			width: 80px;
+			height: 80px;
+			border-radius: 10px;
+			margin-right: 10px;
+			cursor: pointer;
+		}
+		
+		.theme-chooser.selected {
+			border: 1px solid #428bca;
+			box-shadow: 0 0 5px #428bca;
+		}
+	</style>
+{% endblock %}
+
+{% block settings_menu_item %} class="active"{% endblock %}
+
+{% block body %}
+<div class="container">
+	<h1><span class="glyphicon glyphicon-cog"></span> Nastavení</h1><br>
+	<form class="form-horizontal" role="form" style="width: 500px" action="/settings" method="POST">
+  	  <div class="form-group">
+  	    <label for="sounds" class="col-sm-2 control-label">Jazyk</label>
+  	    <div class="col-sm-10">
+  		  <select id="language" name="language">
+		    <option value="en_US"{{ " selected" if user.language == "en_US" }}>English</option>
+			<option value="cs_CZ"{{ " selected" if user.language == "cs_CZ" }}>Čeština</option>
+  		  </select>
+  	    </div>
+  	  </div><br>
+	  <div class="form-group">
+	    <label class="col-sm-2 control-label">Vzhled</label>
+	    <div class="col-sm-10">
+	      <img src="/assets/img/bw.png" class="theme-chooser selected">
+		  <!--<img src="/assets/img/bw.png" class="theme-chooser">-->
+	    </div>
+	  </div><br>
+	  <div class="form-group">
+	    <label for="difficulty" class="col-sm-2 control-label">Obtížnost</label>
+	    <div class="col-sm-10">
+		  <input id="difficulty" name="difficulty" data-slider-id="difficultySlider" class="form-control" type="text" data-slider-min="0" data-slider-max="3" data-slider-step="1" data-slider-value="{{ user.difficulty }}"/>
+	    </div>
+	  </div><br>
+	  <div class="form-group">
+	    <label for="sounds" class="col-sm-2 control-label">Zvuky</label>
+	    <div class="col-sm-10">
+		  <input id="sounds" name="sounds" type="checkbox"{{ " checked" if user.sounds }}/>
+	    </div>
+	  </div><br>
+	  <div class="form-group">
+	    <div class="col-sm-10">
+	      <button type="submit" class="btn btn-primary">Uložit</button>
+	    </div>
+	  </div>
+	</form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+	
+	<script src="/assets/js/bootstrap-slider.min.js"></script>
+	<script>
+		$('#difficulty').slider({
+			formatter: function(value) {
+				
+				switch (value) {
+				  case 0:
+				    difficulty = "nejlehčí"
+				    break;
+				  case 1:
+				    difficulty = "trošku lehčí"
+				    break;
+				  case 2:
+				    difficulty = "normální"
+				    break;
+				  case 3:
+				    difficulty = "trošku těžší"
+				    break;
+				  default:
+				    difficulty = "no nevim"
+				}
+				
+				
+				return 'Obtížnost: ' + difficulty;
+			}
+		});
+		
+		$(".theme-chooser").click(function() {
+			$(".theme-chooser").removeClass('selected');
+			$(this).addClass('selected');
+	    });
+	</script>
+{% endblock %}

@@ -1,0 +1,323 @@
+{% extends "en_US/base.html" %}
+
+{% block head %}
+	{{ super() }}
+	<link href="/assets/css/stopwatch.css" rel="stylesheet">
+	<style>
+		#game-info {
+			width: 100%;
+			margin-bottom: 20px;
+		}
+
+		#game-info tr:nth-child(2) td, #game-info tr:nth-child(4) td {
+			padding: 0 10px;
+			height: 33px;
+		}
+
+		/*#game-info tr:nth-child(2) td:nth-child(1) {
+			text-align: left;
+		}
+
+		#game-info tr:nth-child(4) td:nth-child(3) {
+			text-align: right;
+		}*/
+
+		.progress {
+			width: 100%;
+			height: 2px;
+			margin: 0;
+			background: #E6E6E6;
+		}
+
+		.progress-bar {
+			background: darkgray;
+		}
+
+		#progress-2 {
+			float: right;
+		}
+
+		#moves-list {
+			overflow: scroll;
+			height: 500px;
+		}
+
+		#moves-list em {
+			color: gray;
+		}
+
+		.footer {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			height: 50px;
+			background-color: #222;
+		}
+
+		.container .text-muted {
+			margin: 15px 0;
+			text-align: center;
+		}
+
+		.footer > .container {
+			padding-right: 15px;
+			padding-left: 15px;
+		}
+		
+		#chess-board tr:nth-child(2) td {
+			border-top: 1px solid black;
+		}
+
+		#chess-board tr:nth-child(9) td {
+			border-bottom: 1px solid black;
+		}
+
+		#chess-board td:nth-child(2) {
+			border-left: 1px solid black;
+		}
+
+		#chess-board td:nth-child(9) {
+			border-right: 1px solid black;
+		}
+
+		#chess-board {
+			border-collapse: collapse;
+			margin: 0 auto;
+			color: black;
+	
+			/*background: white;*/
+			/*background: rgb(185, 158, 111);*/
+			background:#fff;
+			background:-moz-linear-gradient(top, #fff, #eee);
+			background:-webkit-gradient(linear,0 0, 0 100%, from(#fff), to(#eee));
+	
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select:none;
+			user-select:none;
+		}
+
+		#chess-board tr:nth-child(odd) td:nth-child(even), #chess-board tr:nth-child(even) td:nth-child(odd) {
+			/*background: black;*/
+			/*background: rgb(90, 41, 38);*/
+			background:#ccc;
+			background:-moz-linear-gradient(top, #ccc, #eee);
+			background:-webkit-gradient(linear,0 0, 0 100%, from(#ccc), to(#eee));
+		}
+
+		#board-overlay {
+			/*width: 720px;
+			height: 720px;
+			margin: 0 auto;*/
+			width: 640px;
+			height: 640px;
+			margin: 40px auto 0 auto;
+			background: rgba(0, 0, 0, 0.33);
+			position: relative;
+			top: -720px;
+			display: none;
+		}
+
+		#board-waiting, #board-gameover {
+			width: 200px;
+			height: 100px;
+			background:#fff;
+			background:-moz-linear-gradient(top, #fff, #eee);
+			background:-webkit-gradient(linear,0 0, 0 100%, from(#fff), to(#eee));
+			text-align: center;
+			margin: auto;
+			position: relative;
+			top: 270px;
+			border-radius: 10px;
+			opacity: 0.9;
+		}
+
+		#board-waiting-text {
+			padding-top: 70px;
+		}
+	
+		#board-gameover {
+			padding-top: 38px;
+			font-size: 20px;
+			display: none;
+		}
+
+		#chess-board td {
+			width: 80px;
+			height: 80px;
+			text-align: center;
+			font-size: 50px;
+		}
+
+		#chess-board tr:nth-child(1) td, #chess-board tr td:nth-child(1), #chess-board tr:nth-child(10) td, #chess-board tr td:nth-child(10) {
+			width: 40px;
+			height: 40px;
+			background: white !important;
+			box-shadow: none !important;
+			font-size: 15px;
+			cursor: default;
+			color: gray;
+			border: none;
+		}
+
+		.navbar-brand {
+			color: white !important;
+		}
+
+		#chess-board td:not(.X) {
+			cursor: pointer;
+		}
+
+		.W_K:before { content: '♚'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+		.W_Q:before { content: '♛'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+		.W_R:before { content: '♜'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+		.W_B:before { content: '♝'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+		.W_N:before { content: '♞'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+		.W_P:before { content: '♟'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+
+		.B_K:before { content: '♚'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+		.B_Q:before { content: '♛'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+		.B_R:before { content: '♜'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+		.B_B:before { content: '♝'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+		.B_N:before { content: '♞'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+		.B_P:before { content: '♟'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+
+		#chess-board td.selected-piece {
+			text-shadow: 0 0 10px #0080FF;
+		}
+
+		#chess-board td.hint {
+			cursor: pointer;
+		}
+
+		#chess-board td.hint:after {
+			content: "";
+			display: block;
+			width: 20px;
+			height: 20px;
+			margin: 0 auto;
+			border-radius: 50%;
+			background: transparent;
+			box-shadow: inset 0 0 5px #0080FF, 0 0 5px #0080FF;
+		}
+
+		#chess-board td.enemy_hint {
+			background: rgba(255, 0, 0, 0.25) !important;
+			/*text-shadow: 0 0 10px red;*/
+		}
+
+		.list-group-item.action {
+			background: lightgrey;
+		}
+		.list-group-item.important {
+			background: lightpink;
+		}
+	</style>
+{% endblock %}
+		
+{% block body %}
+<div class="container">
+	<div class="row row-offcanvas row-offcanvas-right">
+		<div class="col-xs-12 col-sm-9">
+			<table id="chess-board">
+				<tbody>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+					<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+				</tbody>
+			</table>
+			<div id="board-overlay">
+				<div id="board-waiting">
+					<div class="clock">
+					  <div class="clock_knob"></div>
+					  <div class="clock_hand"></div>
+					</div>
+					<div id="board-waiting-text">Waiting for opponent...</div>
+				</div>
+				<div id="board-gameover">
+					<div id="board-gameover-text"></div>
+				</div>
+			</div>
+        </div>
+
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+			<h4>Game</h4>
+			<table id="game-info" border="0">
+				<tr><td><div class="progress"><div class="progress-bar" id="progress-1" style="width: 0%;"></div></div></td></tr>
+				<tr><td style="text-align: left"><span class="W_R"></span> {{ game.localizedWhitePlayerName(user.language) }}</td></tr>
+				<tr><td style="text-align: center;"><small>vs</small></td></tr>
+				<tr><td style="text-align: right;">{{ game.localizedBlackPlayerName(user.language) }} <span class="B_R"></span></td></tr>
+				<tr><td><div class="progress"><div class="progress-bar" id="progress-2" style="width: 0%;"></div></div></td></tr>
+			</table><hr>
+			<h4>History</h4>
+			<div id="moves-list" class="list-group">
+				{% for move in range((game.moves|length // 2))|reverse %}
+					<span class="list-group-item">{{ game.moves[move*2] }} | {{ game.moves[move*2+1] }}</span>
+				{% endfor %}
+				<span class="list-group-item"><em>Game started</em><!-- <span class="badge">00:00</span>--></span>
+			</div>
+	  	</div><!--/span-->
+	</div><!--/row-->	  
+</div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+	
+	<script type="text/javascript" src="/assets/js/utilities.js"></script>
+	<script type="text/javascript" src="/assets/js/chess.js"></script>
+	<script type="text/javascript" src="/_ah/channel/jsapi"></script>
+	<script type="text/javascript">
+		// Board
+		{% if board %}
+		var boardArray = []
+		var board = '{{ board }}'.replace(/ /g, '');
+		board = board.split('\n').slice(2, 10);
+		for (row in board) {
+			boardArray.push(board[row].split(''))
+		}
+		{% endif %}
+		
+		// User settings
+		CHESS_APP.lang = '{{ user.language }}';
+		CHESS_APP.sounds = {{ user.sounds|lower if user else 'true' }};
+		
+		// User color
+		if ("{{ color }}" == "black") {
+			CHESS_APP.isBlack = true
+		} else {
+			CHESS_APP.isBlack = false
+		}
+		
+		// Game data
+		{% if json %}
+		var jsonStr = '{{ json }}';
+		var data = $.parseJSON(jsonStr);
+		CHESS_APP.data = data;
+		checkGameOver();
+		{% endif %}
+		
+		// Cell click handler
+		$('#chess-board tr td').click(function() {
+		    CHESS_APP.board.cellClicked($(this));
+		});
+		
+		// Initialization
+		$(function() {
+			CHESS_APP.startTime = new Date();
+			CHESS_APP.game_id = "{{ game.key.id() }}";
+			CHESS_APP.board = new Board(boardArray);
+			CHESS_APP.board.redraw();
+			
+			openSocket('{{ channel_token }}');
+		});
+		
+	</script>
+{% endblock %}

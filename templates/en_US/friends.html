@@ -1,0 +1,160 @@
+{% extends "en_US/base.html" %}
+
+{% block head %}
+	{{ super() }}
+	
+	<style>
+		#friends-table td:not(.actionsCell):not(.emptyRow) {
+			color: black;
+			font-size: 18px;
+			line-height: 34px !important;
+			padding: 8px 20px !important;
+		}
+		#results-container {
+			height: 200px;
+			overflow: auto;
+			display: none;
+		}
+		#results-container tr {
+			height: 51px;
+		}
+		#results-container td:nth-child(1) {
+			vertical-align: middle;
+			font-size: 16px;
+		}
+		#results-container td:nth-child(2) {
+			width: 1px;
+		}
+		#addbutton {
+			margin-top: 22px;
+		}
+		.actionsCell {
+			color: black;
+			font-size: 18px;
+			line-height: 34px !important;
+			padding: 8px 0 !important;
+		}
+		.emptyRow {
+			color: gray !important;
+			background: white !important;
+			line-height: 50px !important;
+			border: none !important;
+			padding: 0;
+			font-size: 20px;
+			text-align: center;
+		}
+	</style>
+{% endblock %}
+
+{% block friends_menu_item %} class="active"{% endblock %}
+
+{% block modals %}
+	{{ super() }}
+	<div class="modal fade" id="addFriendModal" tabindex="-1" role="dialog">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title"><span class="glyphicon glyphicon-search"></span> Search friends</h4>
+	      </div>
+	      <div class="modal-body">
+			<div class="form-group" style="margin-left: 54px;">
+				<input type="text" id="search-input" class="form-control" placeholder="Username or e-mail" style="width: 360px; display: initial;">
+				<button id="search-button" class="btn btn-default" style="margin-top: -2px;"><span class="glyphicon glyphicon-search"></span> Search</button>
+			</div>
+			<div id="results-container">
+			</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+	<h1 class="pull-left"><span class="glyphicon glyphicon-user"></span> Friends</h1>
+	<button id="addbutton" class="btn btn-default pull-right" data-toggle="modal" data-target="#addFriendModal"><span class="glyphicon glyphicon-search"></span> Search</button>
+	{% if user.requestedFriends|length > 0 %}
+	<table id="friends-table" class="table table-striped">
+		<col><col style="width: 105px;">
+		<tr><th colspan="2">Friend requests</th></tr>
+		{% for friendKey in user.requestedFriends %}
+		<tr>
+			<td>{{ friendKey.get().username() }}</td>
+			<td class="actionsCell">
+				<a href="/friends/{{ friendKey.id() }}/requestResponse?action=accept" class="btn btn-success"><span class="glyphicon glyphicon-ok"></a>
+				<a href="/friends/{{ friendKey.id() }}/requestResponse?action=reject" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></a>
+			</td>
+		</tr>
+		{% endfor %}
+	</table><br>
+	{% endif %}
+	<table id="friends-table" class="table table-striped">
+	{% if user.friends|length > 0 %}
+		<col><col style="width: 60px;">
+		<tr><th colspan="2">Friends</th></tr>
+		{% for friendKey in user.friends %}
+		<tr>
+			<td>{{ friendKey.get().username() }}</td>
+			<td class="actionsCell"><a href="/friends/{{ friendKey.id() }}/remove" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></a></td>
+		</tr>
+		{% endfor %}
+	{% else %}
+		<tr><td class="emptyRow">No friends</td></tr>
+	{% endif %}
+	</table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+	{{ super() }}
+	
+	<script>
+		$('#addFriendModal').on('shown.bs.modal', function (event) {
+			$('#search-input').focus()
+		});
+	
+		/*$('#addFriendModal').on('hidden.bs.modal', function (event) {
+			//$('#search-input').val('')
+	    	//$('#results-container').hide()
+			location.reload()
+		});*/
+		
+		$('#search-button').click(search);
+		$('#search-input').keypress(function (e) { if (e.which == 13) { search(); return false; } });
+		
+		function search() {
+			$('#results-container').slideUp(400, function() {
+				$.ajax({
+					url: "/friends/search",
+					data: { "query": $('#search-input').val() }
+				})
+				.done(function(result) {
+					$('#results-container').html(result)
+					$('#results-container').slideDown()	
+				})
+			});
+		}
+		
+		$('#results-container').on('click', '.add-friend-btn', function(){			
+			var button = $(this).button('loading')
+			var key = button.parent().parent().data('key')
+			
+			setTimeout(function() {
+				$.ajax({
+					url: "/friends/sendRequest",
+					method: "POST",
+					data: { "key": key }
+				})
+				.done(function(result) {
+					button.html('<span class="glyphicon glyphicon-ok"></span> Request sent')
+					button.attr('disabled', true)
+				})
+				.fail(function(jqXHR, textStatus) {
+					alert('addFriend error: '+textStatus)
+					button.button('reset')
+				})
+			}, 500);
+		})
+	</script>
+{% endblock %}

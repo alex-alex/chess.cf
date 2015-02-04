@@ -1,0 +1,91 @@
+{% extends "en_US/base.html" %}
+
+{% block head %}
+	{{ super() }}
+	
+	<style>
+		.clickRow td {
+			cursor: pointer;
+			color: black;
+			font-size: 18px;
+			line-height: 34px !important;
+			padding: 8px 20px !important;
+		}
+		.clickRow:hover td {
+			background: darkgray !important;
+		}
+		#newgame-button {
+			margin-top: 22px;
+		}
+		
+		.W_R:before { content: '♜'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+		.B_R:before { content: '♜'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+		
+		.dateCell {
+			text-align: center;
+		}
+		
+		.actionsCell {
+			text-align: right;
+			color: white  !important;
+		}
+		
+		.statusCell {
+			
+		}
+		
+		.emptyRow {
+			color: gray;
+			background: white  !important;
+			line-height: 50px !important;
+			border: none !important;
+			padding: 0;
+			font-size: 20px;
+			text-align: center;
+		}
+	</style>
+{% endblock %}
+
+{% block games_menu_item %} class="active"{% endblock %}
+
+{% block body %}
+<div class="container">
+	<h1 class="pull-left"><span class="glyphicon glyphicon-th-list"></span> My games</h1>
+	<button id="newgame-button" class="btn btn-default pull-right" data-toggle="modal" data-target="#newGameModal"><span class="glyphicon glyphicon-play-circle"></span> New game</button>
+	<table class="table table-striped" border="0">
+		<col style="width: 40%;"><col style="width: 40%;"><col style="width: 20%;"><col style="width: 0;">
+		{% for game in games %}
+		<tr class="clickRow" data-href="/g/{{ game.key.id()|num_encode }}">
+			<td><span class="W_R"></span> {{ game.localizedWhitePlayerName(user.language) }} vs <span class="B_R"></span> {{ game.localizedBlackPlayerName(user.language) }}</td>
+			<td class="statusCell">
+				{% if game.status == 1 %}
+				New game
+				{% elif game.status == 2 %}
+				Game in progress
+				{% elif game.status == 4 %}
+				White won
+				{% elif game.status == 8 %}
+				Black won
+				{% elif game.status == 16 %}
+				Draw
+				{% endif %}
+			</td>
+			<td class="dateCell">{{ game.dateCreated.strftime('%d.%m.%Y %H:%M') }}</td>
+			<td class="actionsCell"><a href="/g/{{ game.key.id() }}/leave" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></a></button></td>
+		</tr>
+		{% else %}
+		<tr><td class="emptyRow">No games</td></tr>
+		{% endfor %}
+	</table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+	{{ super() }}
+	
+	<script>
+		$(".clickRow td:not(.actionsCell)").click(function() {
+	    	window.document.location = $(this).parent().data("href");
+	    });
+	</script>
+{% endblock %}
