@@ -1,0 +1,283 @@
+.menu {
+	position: fixed;
+	top: 0;
+	width: 250px;
+	height: -webkit-calc(100% - 91px);
+	margin-top: 71px;
+	padding: 5px 0;
+	text-align: center;
+	background: #eee;
+	border-radius: 20px;
+	border: 1px solid #ccc;
+	font-size: 18px;
+}
+
+hr {
+	border-bottom: 1px solid #ccc;
+	margin: 0;
+	padding-bottom: 5px;
+}
+
+#leftMenu {
+	left: 20px;
+}
+
+#rightMenu {
+	right: 20px;
+}
+
+#chat {
+	position: relative;
+	width: 100%;
+	height: -webkit-calc(100% - 210px);
+}
+
+#chat-history {
+	height: -webkit-calc(100% - 31px);
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#chat-history table {
+	width: 100%;
+}
+
+#chat-history table td:first-child {
+	width: 40px;
+	text-align: right;
+	vertical-align: top;
+	padding-top: 4px;
+	padding-right: 3px;
+	color: gray;
+	font-size: 12px;
+}
+
+#chat-history table td:last-child {
+	text-align: left;
+	font-size: 16px;
+	color: #333;
+}
+
+#moves-list {
+	height: -webkit-calc(100% - 26px);
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#moves-list .list-group-item {
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid #ccc;
+	text-align: left;
+	font-size: 16px;
+	border-radius: 0;
+	color: #333;
+}
+
+#moves-list .list-group-item em {
+	color: gray;
+}
+
+#moves-list .list-group-item:last-child {
+	border: none;
+}
+
+.player-label {
+	font-weight: bold;
+}
+
+.player-label-white {
+	color: white;
+	text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+}
+
+.player-label-black {
+	color: black;
+}
+
+#chat-input-panel {
+	width: 100%;
+	height: 31px;
+	position: absolute;
+	bottom: 0;
+}
+
+#chat-input-panel input {
+	width: 72%;
+}
+
+#chat-input-panel button {
+	width: 25%;
+}
+
+.video {
+	position: absolute;
+}
+
+#video {
+	height: 160px;
+	bottom: 10px;
+	left: 10px;
+}
+
+#video > video {
+	/* max-width */
+	width: 229px;
+	height: 160px;
+	border-radius: 10px;
+	background-color: black;
+	border: 1px solid #ccc;
+}
+
+#videoPreview {
+	height: 50px;
+	bottom: 5px;
+	right: 5px;
+	border-radius: 5px;
+	opacity: 0.75;
+}
+
+#videoPreview > video {
+	width: 80px;
+	height: 50px;
+	border-radius: 5px;
+	background-color: black;
+	border: 1px solid #ccc;
+}
+
+#smallOverlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: white;
+	color: black;
+	padding-top: 71px;
+	text-align: center;
+	display: none;
+	font-size: 30px;
+}
+
+.inner {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#boardContainer {
+	position: relative;
+	top: 50%;
+	left: 50%;
+	height: 800px;
+	width: 800px;
+	margin-left: -400px;
+	margin-top: -375px;
+	font-size: 50px;
+}
+
+/* ---- Chess board ---- */
+
+#chess-board {
+	position: relative;
+	top: 3%;
+	left: 0;
+	width: 94%;
+	height: 94%;
+	text-align: center;
+	table-layout: fixed;
+	
+	border-collapse: collapse;
+	margin: 0 auto;
+	color: black;
+	
+	background:#fff;
+	background:-moz-linear-gradient(top, #fff, #eee);
+	background:-webkit-gradient(linear,0 0, 0 100%, from(#fff), to(#eee));
+
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select:none;
+	user-select:none;
+}
+
+#chess-board td {
+	width: 10%;
+	height: 10%;
+}
+
+#chess-board tr:nth-child(2) td {
+	border-top: 1px solid #ccc;
+}
+
+#chess-board tr:nth-child(9) td {
+	border-bottom: 1px solid #ccc;
+}
+
+#chess-board td:nth-child(2) {
+	border-left: 1px solid #ccc;
+}
+
+#chess-board td:nth-child(9) {
+	border-right: 1px solid #ccc;
+}
+
+#chess-board tr:nth-child(odd) td:nth-child(even), #chess-board tr:nth-child(even) td:nth-child(odd) {
+	background:#ccc;
+	background:-moz-linear-gradient(top, #ccc, #eee);
+	background:-webkit-gradient(linear,0 0, 0 100%, from(#ccc), to(#eee));
+}
+
+#chess-board tr:nth-child(1) td, #chess-board tr td:nth-child(1), #chess-board tr:nth-child(10) td, #chess-board tr td:nth-child(10) {
+	width: 40px;
+	height: 40px;
+	background: white !important;
+	box-shadow: none !important;
+	font-size: 15px;
+	cursor: default;
+	color: gray;
+	border: none;
+}
+
+#chess-board td:not(.X) {
+	cursor: pointer;
+}
+
+.W_K:before { content: '♚'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+.W_Q:before { content: '♛'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+.W_R:before { content: '♜'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+.W_B:before { content: '♝'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+.W_N:before { content: '♞'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+.W_P:before { content: '♟'; color: white; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black; }
+
+.B_K:before { content: '♚'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+.B_Q:before { content: '♛'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+.B_R:before { content: '♜'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+.B_B:before { content: '♝'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+.B_N:before { content: '♞'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+.B_P:before { content: '♟'; color: black; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white; }
+
+#chess-board td.selected-piece {
+	text-shadow: 0 0 10px #0080FF;
+}
+
+#chess-board td.hint {
+	cursor: pointer;
+}
+
+#chess-board td.hint:after {
+	content: "";
+	display: block;
+	width: 20px;
+	height: 20px;
+	margin: 0 auto;
+	border-radius: 50%;
+	background: transparent;
+	box-shadow: inset 0 0 5px #0080FF, 0 0 5px #0080FF;
+}
+
+#chess-board td.enemy_hint {
+	background: rgba(255, 0, 0, 0.25) !important;
+}
