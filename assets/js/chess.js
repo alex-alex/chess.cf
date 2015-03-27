@@ -566,3 +566,64 @@ Board.prototype.cellClicked = function(cell) {
 		}
 	}
 }
+
+// ------------------------------------
+// Board resizing, WebRTC
+// ------------------------------------
+
+function resizeBoard() {
+	$('#smallOverlay').hide();
+	var width = $(window).width() - 520;
+	var height = $(window).height() - 70;
+	var size = Math.min(width, height);
+	if (size < 400) {
+		$('#smallOverlay').show();
+	} else {
+		$('#boardContainer').css('width', size);
+		$('#boardContainer').css('height', size);
+		$('#boardContainer').css('margin-top', -(size/2)+25);
+		$('#boardContainer').css('margin-left', -(size/2));
+		$('#boardContainer').css('font-size', size/16);
+	}
+}
+
+$(window).resize(function() {
+	resizeBoard();
+});
+
+// Video
+
+var userVideo = $('#userVideo')[0];
+var userVideo2 = $('#userVideo2')[0];
+
+function gumInit() {
+	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+	if (navigator.getUserMedia) {
+		navigator.getUserMedia({video: true}, function(stream) {
+			$('#video').show();
+			$('#chat').css('height', '-webkit-calc(100% - 210px)');
+			
+			if ('mozSrcObject' in userVideo) {
+				userVideo.mozSrcObject = stream;
+				userVideo2.mozSrcObject = stream;
+			} else if (window.webkitURL) {
+				userVideo.src = window.webkitURL.createObjectURL(stream);
+				userVideo2.src = window.webkitURL.createObjectURL(stream);
+			} else {
+				userVideo.src = stream;
+				userVideo2.src = stream;
+			}
+			userVideo.play();
+			userVideo2.play();
+		}, function(error) {
+			console.error('GUM Error: ', error);
+		});
+	}
+}
+
+// Initialization
+
+$(function() {
+	resizeBoard();
+	//gumInit();
+});

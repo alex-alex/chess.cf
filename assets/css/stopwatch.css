@@ -49,8 +49,8 @@
 
 .clock_hand {
   background: #686868;
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 100%;
   position: absolute;
   top: 0;

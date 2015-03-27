@@ -29,7 +29,7 @@ hr {
 #chat {
 	position: relative;
 	width: 100%;
-	height: -webkit-calc(100% - 210px);
+	height: -webkit-calc(100% - 160px);
 }
 
 #chat-history {
@@ -118,6 +118,7 @@ hr {
 	height: 160px;
 	bottom: 10px;
 	left: 10px;
+	display: none;
 }
 
 #video > video {
@@ -176,6 +177,18 @@ hr {
 	margin-left: -400px;
 	margin-top: -375px;
 	font-size: 50px;
+}
+
+/* ---- Game info ---- */
+
+#game-info {
+	width: 90%;
+	margin: 10px auto 0 auto;
+}
+
+#game-info tr:nth-child(2) td, #game-info tr:nth-child(4) td {
+	padding: 0 10px;
+	height: 33px;
 }
 
 /* ---- Chess board ---- */
@@ -280,4 +293,40 @@ hr {
 
 #chess-board td.enemy_hint {
 	background: rgba(255, 0, 0, 0.25) !important;
+}
+
+#board-overlay {
+	width: 100%;
+	height: 100%;
+	margin: 40px auto 0 auto;
+	background: rgba(0, 0, 0, 0.33);
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: none;
+}
+
+#board-waiting, #board-gameover {
+	width: 200px;
+	height: 100px;
+	background:#fff;
+	background:-moz-linear-gradient(top, #fff, #eee);
+	background:-webkit-gradient(linear,0 0, 0 100%, from(#fff), to(#eee));
+	text-align: center;
+	margin: -50px auto 0 auto;
+	position: relative;
+	top: 50%;
+	border-radius: 10px;
+	opacity: 0.9;
+	font-size: 16px;
+}
+
+#board-waiting-text {
+	padding-top: 70px;
+}
+
+#board-gameover {
+	padding-top: 38px;
+	font-size: 20px;
+	display: none;
 }
