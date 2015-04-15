@@ -85,11 +85,11 @@ class FriendsSearchHandler(utilities.BaseHandler):
 				"SEND_REQUEST": "Send request"
 			},
 			"cs_CZ": {
-				"ADDED": "Přidáno",
-				"REQUEST_SENT": "Žádost odeslána",
-				"SENDING": "Odesílání...",
-				"NO_USERS_FOUND": "Nenalezeni žádní uživatelé",
-				"SEND_REQUEST": "Odeslat žádost"
+				"ADDED": u"Přidáno",
+				"REQUEST_SENT": u"Žádost odeslána",
+				"SENDING": u"Odesílání...",
+				"NO_USERS_FOUND": u"Nenalezeni žádní uživatelé",
+				"SEND_REQUEST": u"Odeslat žádost"
 			}
 		}
 		
