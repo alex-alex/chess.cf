@@ -373,6 +373,23 @@ class GameLeaveHandler(utilities.BaseHandler):
 		time.sleep(1)
 		self.redirect(self.uri_for('games'))
 
+class GameSendHandler(utilities.BaseHandler):
+	@utilities.userRequired
+	def post(self, game_id):
+		game = ndb.Key(Game, int(game_id)).get()
+		color, opponent_played = utilities.colorAndPlayerForGame(self.user, game)
+		
+		msgType = self.request.get('msgType')
+		msgContent = self.request.get('msgContent')
+		
+		jsonObj = {
+			"type":		msgType,
+			"content":	msgContent
+		}
+		
+		client_id = str(game.key.id()) + '-' + "black" if color == "white" else "black"
+		channel.send_message(client_id, json.dumps(jsonObj))
+
 class WebRtcHandler(utilities.BaseHandler):
 	def get(self):
 		self.render_template('webrtc.html')
@@ -398,6 +415,7 @@ _routes = [
     webapp2.Route(r'/g/<game_id>/move', GameMoveHandler, name='game-move'),
     webapp2.Route(r'/g/<game_id>/resetToken', GameResetTokenHandler, name='game-reset-token'),
     webapp2.Route(r'/g/<game_id>/leave', GameLeaveHandler, name='game-leave'),
+    webapp2.Route(r'/g/<game_id>/send', GameSendHandler, name='game-send'),
 	
     webapp2.Route(r'/webrtc-test', WebRtcHandler),
 	

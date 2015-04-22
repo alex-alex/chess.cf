@@ -457,7 +457,7 @@ function playSound(sound) {
 }
 
 function trans(str) {
-	return STRINGS[CHESS_APP.lang][str];
+	return STRINGS[CHESS_APP.lang || 'cs_CZ'][str];
 }
 
 // ------------------------------------
@@ -468,9 +468,15 @@ function openSocket(token) {
     var channel = new goog.appengine.Channel(token);
     var socket = channel.open();
     socket.onmessage = function(message) {
-		processMove($.parseJSON(message.data));
+		var json = $.parseJSON(message.data);
+		if (json.hasOwnProperty('type')) {
+			processMessage(json);
+		} else {
+			processMove(json);
+		}
     };
     socket.onerror = function(error) {
+		console.log("socket onerror: "+JSON.stringify(error));
 		if (error.code == 401) {
 			$.ajax({
 				url: "/g/"+CHESS_APP.game_id+"/resetToken",
@@ -486,6 +492,31 @@ function openSocket(token) {
 			console.log('socket error: '+error.description);
 		}
     };
+}
+
+function processMessage(json) {
+	if (json.type == 'chat') {
+		var date = new Date();
+		$('#chat-history-table').append('<tr><td>'+date.getHours()+':'+pad(date.getMinutes(), 2)+'</td><td><span class="player-label player-label-'+(CHESS_APP.isBlack ? 'white' : 'black')+'">'+(CHESS_APP.isBlack ? trans('WHITE') : trans('BLACK'))+'</span>: '+json.content+'</td></tr>');
+	} else if (json.type == 'call') {
+		//console.log('call: '+json.content);
+		
+		if (navigator.getUserMedia) {
+			$('#video').show();
+			$('#video video').hide();
+			$('#chat').css('height', '-webkit-calc(100% - 340px)');
+			
+			navigator.getUserMedia({video: true}, function(stream) {			
+				$('#userVideo').prop('src', URL.createObjectURL(stream));
+				window.localStream = stream;
+				var call = peer.call(json.content, window.localStream);
+				answerCall(call);
+			}, function(error) {
+				console.error('GUM Error: ', error);
+			});
+		}
+		
+	}	
 }
 
 function processMove(json) {
@@ -576,7 +607,7 @@ function resizeBoard() {
 	var width = $(window).width() - 520;
 	var height = $(window).height() - 70;
 	var size = Math.min(width, height);
-	if (size < 400) {
+	if (size < 200) {
 		$('#smallOverlay').show();
 	} else {
 		$('#boardContainer').css('width', size);
@@ -591,39 +622,102 @@ $(window).resize(function() {
 	resizeBoard();
 });
 
+// ------------------------------------
+// Chat
+// ------------------------------------
+
+function pad(num, size) {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
+
+$('#chat-send-btn').click(function() {
+	var text = $('#chat-input').val();
+	$('#chat-input').val('');
+	var date = new Date();
+	$('#chat-history-table').append('<tr><td>'+date.getHours()+':'+pad(date.getMinutes(), 2)+'</td><td><span class="player-label player-label-'+(CHESS_APP.isBlack ? 'black' : 'white')+'">'+(CHESS_APP.isBlack ? trans('BLACK') : trans('WHITE'))+'</span>: '+text+'</td></tr>');
+	
+	$.ajax({
+		url: "/g/"+CHESS_APP.game_id+"/send",
+		type: "POST",
+		data: { "msgType": "chat", "msgContent": text }
+	}).fail(function(jqXHR, textStatus) {
+		console.log("send fail");
+	});
+	
+});
+
+// ------------------------------------
 // Video
+// ------------------------------------
 
-var userVideo = $('#userVideo')[0];
-var userVideo2 = $('#userVideo2')[0];
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-function gumInit() {
-	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+var peer = new Peer({ key: 'lwjd5qra8257b9', debug: 3});
+
+peer.on('open', function(){
+	console.log('Peer ID: ', peer.id);
+});
+
+peer.on('call', function(call) {
+	call.answer(window.localStream);
+	answerCall(call);
+});
+
+peer.on('error', function(err) {
+	console.error('Peer Error: ', err);
+});
+
+$('#call-btn').click(function(){
+	$('#call-btn').hide();
+	$('#video video').show();
+	makeCall();
+});
+
+function setupCall() {
 	if (navigator.getUserMedia) {
-		navigator.getUserMedia({video: true}, function(stream) {
-			$('#video').show();
-			$('#chat').css('height', '-webkit-calc(100% - 210px)');
-			
-			if ('mozSrcObject' in userVideo) {
-				userVideo.mozSrcObject = stream;
-				userVideo2.mozSrcObject = stream;
-			} else if (window.webkitURL) {
-				userVideo.src = window.webkitURL.createObjectURL(stream);
-				userVideo2.src = window.webkitURL.createObjectURL(stream);
-			} else {
-				userVideo.src = stream;
-				userVideo2.src = stream;
-			}
-			userVideo.play();
-			userVideo2.play();
-		}, function(error) {
-			console.error('GUM Error: ', error);
-		});
+		$('#video').show();
+		$('#video video').hide();
+		$('#chat').css('height', '-webkit-calc(100% - 340px)');
 	}
 }
 
+function makeCall() {
+	navigator.getUserMedia({video: true}, function(stream) {			
+		$('#userVideo').prop('src', URL.createObjectURL(stream));
+		window.localStream = stream;
+		
+		$.ajax({
+			url: "/g/"+CHESS_APP.game_id+"/send",
+			type: "POST",
+			data: { "msgType": "call", "msgContent": peer.id }
+		}).fail(function(jqXHR, textStatus) {
+			console.log("send fail");
+		});
+		
+	}, function(error) {
+		console.error('GUM Error: ', error);
+	});
+}
+
+function answerCall(call) {
+	if (window.existingCall) {
+		window.existingCall.close();
+	}
+	
+	call.on('stream', function(stream){
+		$('#userVideo2').prop('src', URL.createObjectURL(stream));
+	});
+	
+	window.existingCall = call;
+}
+
+// ------------------------------------
 // Initialization
+// ------------------------------------
 
 $(function() {
 	resizeBoard();
-	//gumInit();
+	setupCall();
 });

@@ -106,6 +106,8 @@ class BaseHandler(webapp2.RequestHandler):
 	else:
 		lang = detectLocale(self.request.headers.get('accept_language'))
 	
+	params['user_lang'] = lang
+	
 	template = jinja.get_template(lang+"/"+view_filename)
 	self.response.out.write(template.render(params))
  

@@ -56,7 +56,7 @@
 		<col style="width: 40%;"><col style="width: 40%;"><col style="width: 20%;"><col style="width: 0;">
 		{% for game in games %}
 		<tr class="clickRow" data-href="/g/{{ game.key.id()|num_encode }}">
-			<td><span class="W_R"></span> {{ game.localizedWhitePlayerName(user.language) }} vs <span class="B_R"></span> {{ game.localizedBlackPlayerName(user.language) }}</td>
+			<td><span class="W_R"></span> {{ game.localizedWhitePlayerName(user_lang) }} vs <span class="B_R"></span> {{ game.localizedBlackPlayerName(user_lang) }}</td>
 			<td class="statusCell">
 				{% if game.status == 1 %}
 				Nová hra

@@ -42,48 +42,38 @@
 		<b>Game</b>
 		<hr>
 		<table id="game-info" border="0">
-			<tr><td style="text-align: left"><span class="W_R"></span> {{ game.localizedWhitePlayerName(user.language) }}</td></tr>
+			<tr><td style="text-align: left"><span class="W_R"></span> {{ game.localizedWhitePlayerName(user_lang) }}</td></tr>
 			<tr><td style="text-align: center;"><small>vs</small></td></tr>
-			<tr><td style="text-align: right;">{{ game.localizedBlackPlayerName(user.language) }} <span class="B_R"></span></td></tr>
+			<tr><td style="text-align: right;">{{ game.localizedBlackPlayerName(user_lang) }} <span class="B_R"></span></td></tr>
 		</table>
-		{#% if (game.whitePlayerName() != "__AI__" and game.blackPlayerName() != "__AI__") %#}
-		<!--<hr>
+		{% if (game.whitePlayerName() != "__AI__" and game.blackPlayerName() != "__AI__") %}
+		<hr>
 		<b>Chat</b>
 		<hr>
 		<div id="chat">
 			<div id="chat-history">
-				<table>
+				<table id="chat-history-table">
 					<col class="time-col">
-					<tr>
-						<td>8:23</td>
-						<td><span class="player-label player-label-white">White</span>: Nogol Nogol Nogol Nogol Nogol Nogol Nogol Nogol Nogol Nogol</td>
-					</tr>
-					<tr>
-						<td>8:23</td>
-						<td><span class="player-label player-label-black">Black</span>: Nogol</td>
-					</tr>
 				</table>
 			</div>
 			<div id="chat-input-panel">
-				<input type="text" placeholder="Say something...">
-				<button>Send</button>
+				<input type="text" id="chat-input" placeholder="Say something...">
+				<button id="chat-send-btn">Send</button>
 			</div>
 		</div>
 		<div class="video" id="video">
-			<video id="userVideo2"></video>
+			<video id="userVideo2" autoplay></video>
 			<div class="video" id="videoPreview">
-				<video id="userVideo"></video>
+				<video id="userVideo" autoplay></video>
 			</div>
-		</div>-->
-		{#% endif %#}
+			<button id="call-btn">Call</button>
+		</div>
+		{% endif %}
 	</div>
 	<div class="menu" id="rightMenu">
 		<b>History</b>
 		<hr>
 		<div id="moves-list" class="list-group">
-				{% for move in range((game.moves|length // 2)+1)|reverse %}
-					<span class="list-group-item">{{ game.moves[move*2] }} | {{ game.moves[move*2+1] }}</span>
-				{% endfor %}
 				<span class="list-group-item"><em>Game started</em></span>
 		</div>
 	</div>
@@ -96,6 +86,7 @@
 {% block scripts %}
     {{ super() }}
 	
+	<script type="text/javascript" src="/assets/js/peer.js"></script>
 	<script type="text/javascript" src="/assets/js/utilities.js"></script>
 	<script type="text/javascript" src="/assets/js/chess.js"></script>
 	<script type="text/javascript" src="/_ah/channel/jsapi"></script>
@@ -111,7 +102,7 @@
 		{% endif %}
 		
 		// User settings
-		CHESS_APP.lang = '{{ user.language }}';
+		CHESS_APP.lang = '{{ user_lang }}';
 		CHESS_APP.sounds = {{ user.sounds|lower if user else 'true' }};
 		
 		// User color
