@@ -499,12 +499,9 @@ function processMessage(json) {
 		var date = new Date();
 		$('#chat-history-table').append('<tr><td>'+date.getHours()+':'+pad(date.getMinutes(), 2)+'</td><td><span class="player-label player-label-'+(CHESS_APP.isBlack ? 'white' : 'black')+'">'+(CHESS_APP.isBlack ? trans('WHITE') : trans('BLACK'))+'</span>: '+json.content+'</td></tr>');
 	} else if (json.type == 'call') {
-		//console.log('call: '+json.content);
-		
 		if (navigator.getUserMedia) {
-			$('#video').show();
-			$('#video video').hide();
-			$('#chat').css('height', '-webkit-calc(100% - 340px)');
+			$('#call-btn').hide();
+			$('#video video').show();
 			
 			navigator.getUserMedia({video: true}, function(stream) {			
 				$('#userVideo').prop('src', URL.createObjectURL(stream));
@@ -515,7 +512,6 @@ function processMessage(json) {
 				console.error('GUM Error: ', error);
 			});
 		}
-		
 	}	
 }
 
